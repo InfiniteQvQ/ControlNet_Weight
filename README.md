@@ -11,10 +11,18 @@ such as object prominence, position, and style.
 
 Sample images:
 
-![Sample1](img/sample1.jpg)
+| Original                     | Output                      |
+|------------------------------|-----------------------------|
+| ![Original](img/img1.jpg) | ![Sample1](img/sample1.jpg) |
 
-![Sample2](img/sample2.jpg)
+| Original                     | Output                      |
+|------------------------------|-----------------------------|
+| ![Original](img/img2.jpg) | ![Sample2](img/sample2.jpg) |
 
 
-![Sample3](img/sample3.jpg)
+| Original                     | Output                      |
+|------------------------------|-----------------------------|
+| ![Original](img/img3.jpg) | ![Sample1](img/sample3.jpg) |
+
+
 
