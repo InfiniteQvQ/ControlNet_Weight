@@ -27,14 +27,14 @@ conversation_history = [
         "\"canny_edge_weight\": <float>, "
         "\"generated_prompt\": <string>"
         "}."
-        "The weights should between 0 and 1 and reflect the importance of each control modality to achieve the desired change. "
+        "Each weight is between 0 to 1, they reflect the importance of each control modality to achieve the desired change, so calculate them separately based on the input "
         "in the first parameter, return only one word, that refers to the thing to change"
         "In the last parameter, return only the prompt refers to the things going to change, not contain the original one, and generate prompt to make the new things looks good"
         "The prompt should clearly describe the desired result, ensuring high-quality output."
     )}
 ]
 
-def query_openai_with_memory(user_input):
+def query(user_input):
   
     conversation_history.append({"role": "user", "content": user_input})
 
@@ -48,9 +48,9 @@ def query_openai_with_memory(user_input):
     
     return assistant_response
 
-def call_chat_mask(target_class):
+def mask(name):
     result = subprocess.run(
-        ["python", "chat_mask.py", target_class], capture_output=True, text=True)
+        ["python", "chat_mask.py", name], capture_output=True, text=True)
   
 
 def gen_3map():
@@ -66,11 +66,9 @@ def pin(w):
 def generate_image(prompt):
     device = torch.device("cuda")
 
-    init_image = Image.open("./input.jpg").convert("RGB")
-    mask_image = Image.open("./binary_mask_preserve_size.png").convert("L")
-    combined_control_image = Image.open("./combine.png").convert("L")
-
-    assert init_image.size == mask_image.size == combined_control_image.size, "Image sizes must match!"
+    img = Image.open("./input.jpg").convert("RGB")
+    mask = Image.open("./mask.png").convert("L")
+    combined = Image.open("./combine.png").convert("L")
 
     controlnet = ControlNetModel.from_pretrained("lllyasviel/sd-controlnet-seg", torch_dtype=torch.float16).to(device)
 
@@ -83,9 +81,9 @@ def generate_image(prompt):
 
     output = pipe(
         prompt=prompt,
-        image=init_image,
-        mask_image=mask_image,
-        control_image=combined_control_image,
+        image=img,
+        mask_image=mask,
+        control_image=combined,
         num_inference_steps=100,
         guidance_scale=20,
     ).images[0]
@@ -102,10 +100,10 @@ if __name__ == "__main__":
         if user_message.lower() == "exit":
             print("Goodbye!")
             break
-        response = query_openai_with_memory(user_message)
-        print(f"{response}")
-        response_list = json.loads(response)
-        call_chat_mask(response_list["things_to_change"])
+        res= query(user_message)
+        print(f"{res}")
+        response_list = json.loads(res)
+        mask(response_list["things_to_change"])
         print("mask done")
         gen_3map()
         print("gen done")
